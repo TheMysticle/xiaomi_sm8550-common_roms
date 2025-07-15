@@ -273,7 +273,9 @@ PRODUCT_PACKAGES += \
     DeviceAsWebcamResCommon \
     SystemUIOverlayCommon \
     SettingsOverlayCommon \
-    TelephonyOverlayCommon
+    TelephonyOverlayCommon \
+    WifiResCommonMainline_Sys \
+    WifiOverlayCommon
 
 # Partitions
 PRODUCT_PACKAGES += \
