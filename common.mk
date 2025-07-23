@@ -32,6 +32,10 @@ PRODUCT_PACKAGES += \
     otapreopt_script \
     checkpoint_gc
 
+# VNDK
+PRODUCT_PACKAGES += \
+    libui-v33
+
 # Dolby Audio
 PRODUCT_PACKAGES += \
     XiaomiDolby
@@ -146,6 +150,8 @@ PRODUCT_PACKAGES += \
 # Display
 PRODUCT_PACKAGES += \
     android.hardware.graphics.mapper@4.0-impl-qti-display \
+    android.hardware.graphics.allocator-V1-ndk.vendor \
+    android.hardware.graphics.common-V3-ndk.vendor \
     vendor.qti.hardware.display.demura-service \
     vendor.qti.hardware.display.allocator-service \
     vendor.qti.hardware.display.composer-service
