@@ -11,6 +11,7 @@ from extract_utils.fixups_blob import (
     blob_fixups_user_type,
 )
 from extract_utils.fixups_lib import (
+    lib_fixup_remove,
     lib_fixup_remove_arch_suffix,
     lib_fixup_vendorcompat,
     lib_fixups_user_type,
@@ -43,6 +44,14 @@ lib_fixups: lib_fixups_user_type = {
         'vendor.qti.imsrtpservice@3.1',
         'vendor.qti.diaghal@1.0',
     ): lib_fixup_vendor_suffix,
+    (
+        'libpalclient',
+        'libar-acdb',
+        'libats',
+        'liblx-osal',
+        'libagm',
+        'libar-pal',
+    ): lib_fixup_remove,
 }
 
 
