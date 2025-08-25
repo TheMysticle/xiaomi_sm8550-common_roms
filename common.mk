@@ -69,6 +69,7 @@ PRODUCT_PACKAGES += \
     libfmpal \
     libats \
     libhfp_pal \
+    libpalclient \
     libqcompostprocbundle \
     libqcomvisualizer \
     libqcomvoiceprocessing \
