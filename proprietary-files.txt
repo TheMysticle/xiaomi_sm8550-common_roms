@@ -72,7 +72,6 @@ odm/etc/audio/silent-3sec.wav
 odm/etc/audio/spk.wav
 odm/etc/audio/top_spk.wav
 odm/etc/audio/top_spk_hp.wav
-odm/etc/backend_conf.xml
 odm/etc/init/init.cirrus.rc
 odm/lib64/libaudioroute_ext.so
 vendor/etc/audio_diag.cfg
