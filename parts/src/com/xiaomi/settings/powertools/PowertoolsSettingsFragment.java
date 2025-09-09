@@ -65,10 +65,10 @@ public class PowertoolsSettingsFragment extends PreferenceFragmentCompat
     private static final String CPU_LITTLE_DEFAULT_MAX = "2016000";
     private static final String CPU_LITTLE_DEFAULT_GOV = "walt";
     private static final String CPU_BIG_DEFAULT_MIN = "499200";
-    private static final String CPU_BIG_DEFAULT_MAX = "2803200";
+    private static final String CPU_BIG_DEFAULT_MAX = "2707200";
     private static final String CPU_BIG_DEFAULT_GOV = "walt";
     private static final String CPU_PRIME_DEFAULT_MIN = "595200";
-    private static final String CPU_PRIME_DEFAULT_MAX = "3187200";
+    private static final String CPU_PRIME_DEFAULT_MAX = "2956800";
     private static final String CPU_PRIME_DEFAULT_GOV = "walt";
 
     // CPU Little Preferences
@@ -190,12 +190,15 @@ public class PowertoolsSettingsFragment extends PreferenceFragmentCompat
 
     private void updateUI() {
         if (mPowerProfilePreference != null) {
-            boolean masterEnabled = mPowerProfileUtil.isMasterEnabled();
-            if (masterEnabled) {
+            // Check the override status instead of the master switch
+            boolean overridden = mPowerProfileUtil.isOverriddenByThermal();
+            if (overridden) {
                 mPowerProfilePreference.setEnabled(false);
-                mPowerProfilePreference.setSummary(getString(R.string.powerprofile_tile_disabled_subtitle));
+                mPowerProfilePreference.setSummary(getString(R.string.powerprofile_overridden_subtitle));
             } else {
                 mPowerProfilePreference.setEnabled(true);
+                // Make sure to fetch the current mode to display the correct label
+                mPowerProfileUtil.getManagedMode();
                 mPowerProfilePreference.setSummary(mPowerProfileUtil.getModeLabel());
             }
         }

@@ -26,12 +26,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.database.ContentObserver;
-import android.os.Handler;
-import android.os.PowerManager;
 import android.os.Process;
 import android.os.SystemProperties;
-import android.provider.Settings;
 import android.util.Log;
 
 import androidx.preference.PreferenceManager;
@@ -48,6 +44,10 @@ public class PowerProfileUtil {
     private static final String THERMAL_SCONFIG = "/sys/class/thermal/thermal_message/sconfig";
     public static final String THERMAL_ENABLED_KEY = "thermal_enabled";
     private static final String SYS_PROP = "sys.perf_mode_active";
+    public static final String PROP_THERMAL_CONTROLLED_BY = "sys.thermal.controlled_by";
+    private static final String CONTROLLED_BY_POWERTOOLS = "powertools";
+    private static final String CONTROLLED_BY_PERAPP = "perapp";
+    private static final String PREF_LAST_MODE = "power_profile_last_mode";
     private static final int NOTIFICATION_ID_PERFORMANCE = 1001;
     private static final int NOTIFICATION_ID_GAMING = 1002;
 
@@ -67,7 +67,6 @@ public class PowerProfileUtil {
     private SharedPreferences mSharedPrefs;
     private NotificationManager mNotificationManager;
     private List<String> mGamePackages;
-    private ContentObserver mBatterySaverObserver;
     private int mCurrentMode = MODE_BALANCE;
     private String[] mModes;
 
@@ -90,7 +89,6 @@ public class PowerProfileUtil {
         }
 
         setupNotificationChannel();
-        registerBatterySaverObserver();
     }
 
     public int getCurrentMode() {
@@ -120,6 +118,12 @@ public class PowerProfileUtil {
     }
 
     public void setMode(int mode) {
+        // Explicitly set that Powertools is in control
+        SystemProperties.set(PROP_THERMAL_CONTROLLED_BY, CONTROLLED_BY_POWERTOOLS);
+
+        // Remember this mode as the user's last explicit choice
+        mSharedPrefs.edit().putInt(PREF_LAST_MODE, mode).apply();
+
         mCurrentMode = mode;
         int thermalValue;
         switch (mode) {
@@ -149,22 +153,16 @@ public class PowerProfileUtil {
         boolean success = FileUtils.writeLine(THERMAL_SCONFIG, String.valueOf(thermalValue));
         Log.d(TAG, "Thermal mode changed to " + mModes[mode] + ": " + success);
 
-        if (mode == MODE_BATTERY_SAVER) {
-            enableBatterySaver(true);
+        // Manage notifications based on the mode
+        if (mode == MODE_PERFORMANCE) {
+            showPerformanceNotification();
+            cancelGamingNotification();
+        } else if (mode == MODE_GAMING) {
+            showGamingNotification();
+            cancelPerformanceNotification();
+        } else {
             cancelPerformanceNotification();
             cancelGamingNotification();
-        } else {
-            enableBatterySaver(false);
-            if (mode == MODE_PERFORMANCE) {
-                showPerformanceNotification();
-                cancelGamingNotification();
-            } else if (mode == MODE_GAMING) {
-                showGamingNotification();
-                cancelPerformanceNotification();
-            } else {
-                cancelPerformanceNotification();
-                cancelGamingNotification();
-            }
         }
     }
 
@@ -175,6 +173,25 @@ public class PowerProfileUtil {
             setMode(mCurrentMode);
         }
         return mCurrentMode;
+    }
+
+    /**
+     * Re-applies the last known Power Profile mode.
+     * This is called when Per-App Thermal returns control.
+     */
+    public void restoreState() {
+        Log.d(TAG, "Restoring Power Profile state.");
+        // Read the last user-selected mode from preferences and re-apply it.
+        int lastKnownMode = mSharedPrefs.getInt(PREF_LAST_MODE, MODE_BALANCE);
+        setMode(lastKnownMode);
+    }
+
+    /**
+     * Checks if Per-App Thermal has temporarily taken control.
+     * @return true if Per-App Thermal is active, false otherwise.
+     */
+    public boolean isOverriddenByThermal() {
+        return CONTROLLED_BY_PERAPP.equals(SystemProperties.get(PROP_THERMAL_CONTROLLED_BY));
     }
 
     public boolean isMasterEnabled() {
@@ -251,20 +268,6 @@ public class PowerProfileUtil {
         }
     }
 
-    private void enableBatterySaver(boolean enable) {
-        PowerManager powerManager = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
-        if (powerManager != null) {
-            boolean isBatterySaverEnabled = powerManager.isPowerSaveMode();
-            if (enable && !isBatterySaverEnabled) {
-                powerManager.setPowerSaveModeEnabled(true);
-                Log.d(TAG, "Battery Saver mode enabled.");
-            } else if (!enable && isBatterySaverEnabled) {
-                powerManager.setPowerSaveModeEnabled(false);
-                Log.d(TAG, "Battery Saver mode disabled.");
-            }
-        }
-    }
-
     private void setupNotificationChannel() {
         NotificationChannel channel = new NotificationChannel(
                 TAG,
@@ -318,31 +321,6 @@ public class PowerProfileUtil {
         Log.d(TAG, "Performance mode active set to: " + mode);
     }
 
-    private void registerBatterySaverObserver() {
-        mBatterySaverObserver = new ContentObserver(new Handler()) {
-            @Override
-            public void onChange(boolean selfChange) {
-                boolean isBatterySaverOn = Settings.Global.getInt(
-                        mContext.getContentResolver(),
-                        Settings.Global.LOW_POWER_MODE, 0) == 1;
-                if (isBatterySaverOn && (mCurrentMode == MODE_BALANCE || mCurrentMode == MODE_PERFORMANCE || mCurrentMode == MODE_GAMING)) {
-                    Log.d(TAG, "Battery saver enabled, switching to battery saver thermal mode.");
-                    mCurrentMode = MODE_BATTERY_SAVER;
-                    setMode(mCurrentMode);
-                }
-            }
-        };
-
-        mContext.getContentResolver().registerContentObserver(
-                Settings.Global.getUriFor(Settings.Global.LOW_POWER_MODE),
-                false,
-                mBatterySaverObserver
-        );
-    }
-
     public void cleanup() {
-        if (mBatterySaverObserver != null) {
-            mContext.getContentResolver().unregisterContentObserver(mBatterySaverObserver);
-        }
     }
 }

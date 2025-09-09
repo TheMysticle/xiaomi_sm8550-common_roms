@@ -11,10 +11,9 @@ $(call inherit-product, hardware/qcom-caf/common/common.mk)
 $(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota/launch_with_vendor_ramdisk.mk)
 
 # Charging control for Lineage Health HAL
-$(call soong_config_set,lineage_health,charging_control_charging_path,/sys/class/qcom-battery/input_suspend)
+$(call soong_config_set,lineage_health,charging_control_charging_path,/sys/class/qcom-battery/night_charging)
 $(call soong_config_set,lineage_health,charging_control_charging_enabled,0)
 $(call soong_config_set,lineage_health,charging_control_charging_disabled,1)
-$(call soong_config_set,lineage_health,charging_control_supports_bypass,false)
 
 AB_OTA_POSTINSTALL_CONFIG += \
     RUN_POSTINSTALL_system=true \
@@ -31,6 +30,10 @@ AB_OTA_POSTINSTALL_CONFIG += \
 PRODUCT_PACKAGES += \
     otapreopt_script \
     checkpoint_gc
+
+# VNDK
+PRODUCT_PACKAGES += \
+    libui-v33
 
 # Dolby Audio
 PRODUCT_PACKAGES += \
@@ -55,6 +58,8 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     audioadsprpcd \
     android.hardware.audio.service \
+    audio.primary.kalama \
+    sound_trigger.primary.kalama \
     libagm_compress_plugin \
     libagm_mixer_plugin \
     libagm_pcm_plugin \
@@ -64,10 +69,10 @@ PRODUCT_PACKAGES += \
     libfmpal \
     libats \
     libhfp_pal \
+    libpalclient \
     libqcompostprocbundle \
     libqcomvisualizer \
     libqcomvoiceprocessing \
-    vendor.qti.hardware.AGMIPC@1.0-impl \
     libvolumelistener
 
 PRODUCT_COPY_FILES += \
@@ -86,10 +91,6 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/audio/audio_cloud_control_white_list.xml:$(TARGET_COPY_OUT_VENDOR)/etc/audio_cloud_control_white_list.xml \
     $(LOCAL_PATH)/configs/audio/audio_policy_volumes.xml:$(TARGET_COPY_OUT_VENDOR)/etc/audio_policy_volumes.xml \
     $(LOCAL_PATH)/configs/audio/usecaseKvManager.xml:$(TARGET_COPY_OUT_VENDOR)/etc/usecaseKvManager.xml \
-    $(LOCAL_PATH)/configs/audio/sku_kalama/mixer_paths_kalama_mtp.xml:$(TARGET_COPY_OUT_ODM)/etc/audio/sku_kalama/mixer_paths_kalama_mtp.xml \
-    $(LOCAL_PATH)/configs/audio/sku_kalama/mixer_paths_overlay_dynamic.xml:$(TARGET_COPY_OUT_ODM)/etc/audio/sku_kalama/mixer_paths_overlay_dynamic.xml \
-    $(LOCAL_PATH)/configs/audio/sku_kalama/mixer_paths_overlay_static.xml:$(TARGET_COPY_OUT_ODM)/etc/audio/sku_kalama/mixer_paths_overlay_static.xml \
-    $(LOCAL_PATH)/configs/audio/sku_kalama/resourcemanager_kalama_mtp.xml:$(TARGET_COPY_OUT_ODM)/etc/audio/sku_kalama/resourcemanager_kalama_mtp.xml \
     $(LOCAL_PATH)/configs/audio/sku_kalama/adsp_sleep_monitor.conf:$(TARGET_COPY_OUT_VENDOR)/etc/audio/sku_kalama/adsp_sleep_monitor.conf \
     $(LOCAL_PATH)/configs/audio/sku_kalama/audio_effects.conf:$(TARGET_COPY_OUT_VENDOR)/etc/audio/sku_kalama/audio_effects.conf \
     $(LOCAL_PATH)/configs/audio/sku_kalama/audio_effects.xml:$(TARGET_COPY_OUT_VENDOR)/etc/audio/sku_kalama/audio_effects.xml \
@@ -97,7 +98,9 @@ PRODUCT_COPY_FILES += \
 
 PRODUCT_COPY_FILES += \
     hardware/qcom-caf/sm8550/audio/primary-hal/configs/common/bluetooth_qti_audio_policy_configuration.xml:$(TARGET_COPY_OUT_VENDOR)/etc/bluetooth_qti_audio_policy_configuration.xml \
-    hardware/qcom-caf/sm8550/audio/primary-hal/configs/common/bluetooth_qti_hearing_aid_audio_policy_configuration.xml:$(TARGET_COPY_OUT_VENDOR)/etc/bluetooth_qti_hearing_aid_audio_policy_configuration.xml
+    hardware/qcom-caf/sm8550/audio/primary-hal/configs/common/bluetooth_qti_hearing_aid_audio_policy_configuration.xml:$(TARGET_COPY_OUT_VENDOR)/etc/bluetooth_qti_hearing_aid_audio_policy_configuration.xml \
+    hardware/qcom-caf/sm8550/audio/pal/configs/kalama/card-defs.xml:$(TARGET_COPY_OUT_VENDOR)/etc/card-defs.xml \
+    hardware/qcom-caf/sm8550/audio/primary-hal/configs/kalama/microphone_characteristics.xml:$(TARGET_COPY_OUT_VENDOR)/etc/microphone_characteristics.xml
 
 # Automotive
 PRODUCT_PACKAGES += \
@@ -147,6 +150,8 @@ PRODUCT_PACKAGES += \
 # Display
 PRODUCT_PACKAGES += \
     android.hardware.graphics.mapper@4.0-impl-qti-display \
+    android.hardware.graphics.allocator-V1-ndk.vendor \
+    android.hardware.graphics.common-V3-ndk.vendor \
     vendor.qti.hardware.display.demura-service \
     vendor.qti.hardware.display.allocator-service \
     vendor.qti.hardware.display.composer-service
@@ -292,6 +297,9 @@ PRODUCT_PACKAGES += \
     libpsi
 
 # Radio
+PRODUCT_PACKAGES += \
+    rfs_msm_mpss_readonly_mbnconfig_symlink
+
 PRODUCT_PACKAGES += \
     libril
 
