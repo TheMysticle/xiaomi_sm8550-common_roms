@@ -45,12 +45,16 @@ lib_fixups: lib_fixups_user_type = {
         'vendor.qti.diaghal@1.0',
     ): lib_fixup_vendor_suffix,
     (
-        'libpalclient',
+        'audio.primary.kalama',
         'libar-acdb',
-        'libats',
+        'libar-gsl',
+        'libagmclient',
         'liblx-osal',
-        'libagm',
-        'libar-pal',
+        'libagmmixer',
+        'libats',
+        'libpalclient',
+        'libwpa_client',
+        'vendor.qti.hardware.AGMIPC@1.0-impl',
     ): lib_fixup_remove,
 }
 
@@ -61,6 +65,12 @@ dev_null_sha256 = b'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852
 blob_fixups: blob_fixups_user_type = {
     'odm/lib64/libmt@1.3.so' : blob_fixup()
         .replace_needed('libcrypto.so', 'libcrypto-v33.so'),
+    'odm/lib64/libaudioroute_ext.so' : blob_fixup()
+        .replace_needed('libaudioroute.so', 'libaudioroute-v34.so'),
+    'vendor/lib64/libar-pal.so' : blob_fixup()
+        .replace_needed('libaudioroute.so', 'libaudioroute-v34.so'),
+    'vendor/lib64/libagm.so' : blob_fixup()
+        .replace_needed('libaudioroute.so', 'libaudioroute-v34.so'),
     ('vendor/bin/hw/android.hardware.security.keymint-service-qti',
      'vendor/lib64/libqtikeymint.so') : blob_fixup()
         .add_needed('android.hardware.security.rkp-V3-ndk.so'),
@@ -82,6 +92,7 @@ blob_fixups: blob_fixups_user_type = {
         'vendor/lib64/soundfx/libdlbvol.so',
         'vendor/lib64/soundfx/libhwdap.so',
         'vendor/lib64/soundfx/libswspatializer.so',
+        'vendor/lib64/hw/audio.primary.kalama.so',
     ): blob_fixup()
         .add_needed('libstagefright_foundation-v33.so'),
     'vendor/lib64/c2.dolby.client.so' : blob_fixup()
