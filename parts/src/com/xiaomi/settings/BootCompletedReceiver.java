@@ -26,6 +26,7 @@ import com.xiaomi.settings.autohbm.AutoHbmTileService;
 import com.xiaomi.settings.thermal.ThermalService;
 import com.xiaomi.settings.thermal.ThermalUtils;
 import com.xiaomi.settings.touch.TouchOrientationService;
+import com.xiaomi.settings.touch.TouchUtils;
 import com.xiaomi.settings.utils.ComponentUtils;
 
 public class BootCompletedReceiver extends BroadcastReceiver {
@@ -92,6 +93,15 @@ public class BootCompletedReceiver extends BroadcastReceiver {
             }, GESTURE_INIT_DELAY_MS);
         } catch (Exception e) {
             Log.e(TAG, "Failed to initialize GestureUtils", e);
+        }
+
+        try {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+            boolean isEdgeRejectionEnabled = prefs.getBoolean(Constants.KEY_EDGE_REJECTION, true);
+            if (DEBUG) Log.d(TAG, "Setting initial edge rejection state to: " + isEdgeRejectionEnabled);
+            TouchUtils.setEdgeRejectionEnabled(isEdgeRejectionEnabled);
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to set initial edge rejection state", e);
         }
 
         final DisplayManager displayManager = context.getSystemService(DisplayManager.class);
