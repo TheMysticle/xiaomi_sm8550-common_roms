@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.hardware.display.DisplayManager;
 import android.os.Handler;
+import android.os.UserHandle;
 import android.os.Looper;
 import android.util.Log;
 import android.view.Display;
@@ -24,11 +25,14 @@ import com.xiaomi.settings.autohbm.AutoHbmFragment;
 import com.xiaomi.settings.autohbm.AutoHbmTileService;
 import com.xiaomi.settings.thermal.ThermalService;
 import com.xiaomi.settings.thermal.ThermalUtils;
+import com.xiaomi.settings.touch.TouchOrientationService;
+import com.xiaomi.settings.touch.TouchUtils;
 import com.xiaomi.settings.utils.ComponentUtils;
 
 public class BootCompletedReceiver extends BroadcastReceiver {
     private static final String TAG = "XiaomiParts";
     private static final boolean DEBUG = true;
+    private static final int GESTURE_INIT_DELAY_MS = 5000; // 5 seconds
 
     @Override
     public void onReceive(final Context context, Intent intent) {
@@ -71,6 +75,33 @@ public class BootCompletedReceiver extends BroadcastReceiver {
             }
         } catch (Exception e) {
             Log.e(TAG, "Failed to start HyperChargeService", e);
+        }
+
+        try {
+            if (DEBUG) Log.d(TAG, "Starting TouchOrientationService");
+            // Touchscreen
+            context.startServiceAsUser(new Intent(context, TouchOrientationService.class),
+                    UserHandle.CURRENT);
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to start TouchOrientationService", e);
+        }
+
+        try {
+            new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                if (DEBUG) Log.d(TAG, "Initializing GestureUtils after delay");
+                com.xiaomi.settings.utils.GestureUtils.init(context);
+            }, GESTURE_INIT_DELAY_MS);
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to initialize GestureUtils", e);
+        }
+
+        try {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+            boolean isEdgeRejectionEnabled = prefs.getBoolean(Constants.KEY_EDGE_REJECTION, true);
+            if (DEBUG) Log.d(TAG, "Setting initial edge rejection state to: " + isEdgeRejectionEnabled);
+            TouchUtils.setEdgeRejectionEnabled(isEdgeRejectionEnabled);
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to set initial edge rejection state", e);
         }
 
         final DisplayManager displayManager = context.getSystemService(DisplayManager.class);
