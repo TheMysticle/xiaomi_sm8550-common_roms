@@ -6,6 +6,7 @@
 
 package com.xiaomi.settings.touch;
 
+import android.content.Intent;
 import android.os.Bundle;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragment;
@@ -30,6 +31,14 @@ public class EdgeRejectionSettingsFragment extends PreferenceFragment
         if (Constants.KEY_EDGE_REJECTION.equals(preference.getKey())) {
             boolean isEnabled = (Boolean) newValue;
             TouchUtils.setEdgeRejectionEnabled(isEnabled);
+
+            Intent serviceIntent = new Intent(getContext(), TouchOrientationService.class);
+            if (isEnabled) {
+                getContext().startService(serviceIntent);
+            } else {
+                getContext().stopService(serviceIntent);
+            }
+            
             return true;
         }
         return false;

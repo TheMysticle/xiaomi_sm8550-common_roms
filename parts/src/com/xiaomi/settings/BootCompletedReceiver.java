@@ -78,15 +78,6 @@ public class BootCompletedReceiver extends BroadcastReceiver {
         }
 
         try {
-            if (DEBUG) Log.d(TAG, "Starting TouchOrientationService");
-            // Touchscreen
-            context.startServiceAsUser(new Intent(context, TouchOrientationService.class),
-                    UserHandle.CURRENT);
-        } catch (Exception e) {
-            Log.e(TAG, "Failed to start TouchOrientationService", e);
-        }
-
-        try {
             new Handler(Looper.getMainLooper()).postDelayed(() -> {
                 if (DEBUG) Log.d(TAG, "Initializing GestureUtils after delay");
                 com.xiaomi.settings.utils.GestureUtils.init(context);
@@ -100,8 +91,16 @@ public class BootCompletedReceiver extends BroadcastReceiver {
             boolean isEdgeRejectionEnabled = prefs.getBoolean(Constants.KEY_EDGE_REJECTION, true);
             if (DEBUG) Log.d(TAG, "Setting initial edge rejection state to: " + isEdgeRejectionEnabled);
             TouchUtils.setEdgeRejectionEnabled(isEdgeRejectionEnabled);
+
+            if (isEdgeRejectionEnabled) {
+                if (DEBUG) Log.d(TAG, "Edge rejection is enabled, starting TouchOrientationService.");
+                context.startServiceAsUser(new Intent(context, TouchOrientationService.class), UserHandle.CURRENT);
+            } else {
+                if (DEBUG) Log.d(TAG, "Edge rejection is disabled, TouchOrientationService will not be started.");
+            }
+
         } catch (Exception e) {
-            Log.e(TAG, "Failed to set initial edge rejection state", e);
+            Log.e(TAG, "Failed to set initial edge rejection state or start service", e);
         }
 
         final DisplayManager displayManager = context.getSystemService(DisplayManager.class);
