@@ -78,7 +78,6 @@ blob_fixups: blob_fixups_user_type = {
     (
         'odm/lib64/libaudioroute_ext.so',
         'vendor/lib64/libar-pal.so',
-        'vendor/lib64/libagm.so',
     ): blob_fixup()
         .replace_needed(
             'libaudioroute.so',
@@ -88,16 +87,23 @@ blob_fixups: blob_fixups_user_type = {
         'vendor/lib64/c2.dolby.hevc.dec.so',
         'vendor/lib64/c2.dolby.hevc.enc.so',
         'vendor/lib64/c2.dolby.hevc.sec.dec.so',
+        'vendor/lib64/hw/audio.primary.kalama.so',
+        'vendor/lib64/libcodec2_soft_ac4dec.so',
+        'vendor/lib64/libcodec2_soft_ddpdec.so',
         'vendor/lib64/libDecoderProcessor.so',
         'vendor/lib64/libdlbdsservice.so',
         'vendor/lib64/libdlbpreg.so',
+        'vendor/lib64/libqc2audio_hwaudiocodec.so',
         'vendor/lib64/libswspatializer_ext.so',
         'vendor/lib64/soundfx/libdlbvol.so',
         'vendor/lib64/soundfx/libhwdap.so',
+        'vendor/lib64/soundfx/libmisoundfx.so',
         'vendor/lib64/soundfx/libswspatializer.so',
-        'vendor/lib64/hw/audio.primary.kalama.so',
     ): blob_fixup()
-        .add_needed('libstagefright_foundation-v33.so'),
+        .replace_needed(
+            'libstagefright_foundation.so',
+            'libstagefright_foundation-v33.so',
+        ),
     'vendor/lib64/c2.dolby.client.so' : blob_fixup()
         .add_needed('libcodec2_hidl_shim.so'),
     'vendor/lib64/libqcodec2_core.so' : blob_fixup()
