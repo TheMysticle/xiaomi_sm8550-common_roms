@@ -3,3 +3,5 @@ set_prop(vendor_init, vendor_fp_prop)
 
 # Allow vendor_init to set thermal prop
 set_prop(vendor_init, vendor_thermal_normal_prop)
+set_prop(vendor_init, audio_prop)
+set_prop(vendor_init, vendor_qcc_prop)
