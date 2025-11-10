@@ -17,6 +17,7 @@
 /odm/lib/rfsa/adsp/(.*)?                                                                            u:object_r:same_process_hal_file:s0
 
 # DisplayFeature
+/dev/mi_display/disp_feature u:object_r:vendor_displayfeature_device:s0
 /sys/devices/virtual/mi_display/disp_feature/disp-DSI-+[0-1](/.*)? u:object_r:vendor_sysfs_displayfeature:s0
 
 # Dumpstate
@@ -42,9 +43,6 @@
 /vendor/bin/hw/vendor\.dolby\.hardware\.dms@2\.0-service                   u:object_r:hal_dms_default_exec:s0
 /vendor/bin/hw/dolbycodec2                                                 u:object_r:vendorcodec_exec:s0
 /vendor/bin/hw/vendor\.dolby\.media\.c2@1\.0-service                       u:object_r:mediacodec_exec:s0
-
-# MiCharge
-/(vendor|system/vendor)/bin/hw/vendor\.xiaomi\.hardware\.micharge@1\.0-service u:object_r:vendor_hal_micharge_xiaomi_default_exec:s0
 
 # Ril
 /dev/smd8                                         u:object_r:vendor_radio_smd_device:s0

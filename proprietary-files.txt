@@ -106,8 +106,8 @@ vendor/lib64/libcapiv2udk7vendor.so
 vendor/lib64/libcapiv2uvvendor.so
 vendor/lib64/libdsd2pcm.so
 vendor/lib64/hw/sound_trigger.primary.kalama.so
-vendor/etc/vintf/manifest/manifest_non_qmaa_extn.xml
-vendor/etc/vintf/manifest/manifest_non_qmaa.xml
+vendor/etc/vintf/manifest/manifest_non_qmaa_extn.xml:vendor/etc/vintf/manifest/manifest_non_qmaa_extn_vendor.xml
+vendor/etc/vintf/manifest/manifest_non_qmaa.xml:vendor/etc/vintf/manifest/manifest_non_qmaa_vendor.xml
 vendor/lib64/libeai_fixed.so
 vendor/lib64/libeai_float.so
 vendor/lib64/libfcsam.so;FIX_SONAME
@@ -613,6 +613,7 @@ vendor/lib64/libgnsspps.so
 vendor/lib64/libgps.utils.so
 vendor/lib64/libizat_client_api.so
 vendor/lib64/libizat_core.so
+vendor/lib64/libjnihelper.so
 vendor/lib64/liblbs_core.so
 vendor/lib64/libloc_api_v02.so
 vendor/lib64/libloc_api_wds.so
@@ -875,13 +876,6 @@ vendor/etc/vintf/manifest/vendor.qti.hardware.limits-service.xml
 vendor/lib64/vendor.qti.hardware.limits@1.0.so
 vendor/lib64/vendor.qti.hardware.limits@1.1.so
 vendor/lib64/vendor.qti.hardware.limits@1.2.so
-
-# MiCharge
-vendor/bin/hw/vendor.xiaomi.hardware.micharge@1.0-service
-vendor/etc/init/vendor.xiaomi.hardware.micharge@1.0-service.rc
-vendor/etc/vintf/manifest/vendor.xiaomi.hardware.micharge@1.0.xml
-vendor/lib64/hw/vendor.xiaomi.hardware.micharge@1.0-impl.so
-vendor/lib64/vendor.xiaomi.hardware.micharge@1.0.so
 
 # MFIDOCA
 odm/bin/fidoca

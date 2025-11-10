@@ -5,3 +5,6 @@ type migt_dev, dev_type, mlstrustedobject;
 
 # Ril
 type vendor_radio_smd_device, dev_type;
+
+# Display
+type vendor_displayfeature_device, dev_type;
